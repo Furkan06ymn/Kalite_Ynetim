@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASELSAN | Kalite Yönetim Direktörlüğü & Elektronik Üretim Portalı</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        aselsan: {
+                            dark: '#001426',      // Derin siber askeri zemin
+                            navy: '#00253f',      // ASELSAN kurumsal ana lacivert
+                            card: '#061c31',      // Kart arkaplanı
+                            accent: '#0072CE',    // ASELSAN açık kurumsal mavi
+                            lightBlue: '#38BDF8', // Vurgu mavisi
+                            hover: '#003e6b',
+                            border: '#113554'     // Çerçeve kontur rengi
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-tech {
+            font-family: 'Rajdhani', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #001426;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #113554;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0072CE;
+        }
+        .hud-grid {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 114, 206, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 114, 206, 0.05) 1px, transparent 1px);
+        }
+        @media print {
+            header, nav, #toast-container, .no-print, #auth-container {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-aselsan-dark text-slate-100 min-h-screen flex flex-col selection:bg-aselsan-accent selection:text-white relative hud-grid">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. GİRİŞ EKRANI (LOGIN AUTHENTICATION MODAL / SCREEN)                     -->
+    <!-- ========================================================================= -->
+    <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-aselsan-dark/95 backdrop-blur-md">
+        <div class="w-full max-w-md bg-aselsan-card border border-aselsan-border rounded-2xl shadow-2xl p-6 sm:p-8 relative overflow-hidden">
+            <!-- Glowing Corner Accents -->
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-aselsan-accent/15 rounded-full blur-2xl pointer-events-none"></div>
+
+            <!-- ASELSAN Logo & Badge -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 p-2 shadow-inner mb-3">
+                    <svg class="w-12 h-12 text-white" viewBox="0 0 100 100" fill="currentColor">
+                        <path d="M50 8 L85 24 L85 64 L50 92 L15 64 L15 24 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round"/>
+                        <path d="M50 18 L70 66 L58 66 L50 42 L42 66 L30 66 Z" fill="#FFFFFF"/>
+                        <path d="M25 76 Q 50 62 75 76 Q 50 70 25 76 Z" fill="#38BDF8"/>
+                    </svg>
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="font-extrabold text-3xl tracking-[0.18em] text-white font-tech">ASELSAN</span>
+                    <span class="text-[9px] font-bold text-sky-400 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-800 tracking-wider">SECURING BEYOND</span>
+                </div>
+                <p class="text-xs text-slate-300 font-medium mt-1">Kalite Yönetim Direktörlüğü & SST Portalı</p>
+                <div class="text-[10px] text-slate-500 font-mono mt-0.5">Sayısal Muayene • AS9100D • IPC-A-610G Sınıf 3</div>
+            </div>
+
+            <!-- Login Form -->
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Kurumsal Sicil No / Kullanıcı Kodu</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                        <input type="text" id="login-sicil" required placeholder="Örn: AS-9482" value="AS-9482" 
+                               class="w-full bg-aselsan-navy border border-aselsan-border rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent focus:ring-1 focus:ring-aselsan-accent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Kullanıcı Adı ve Soyadı</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user-check absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                        <input type="text" id="login-name" required placeholder="Örn: Furkan YAMAN" value="Furkan YAMAN" 
+                               class="w-full bg-aselsan-navy border border-aselsan-border rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent focus:ring-1 focus:ring-aselsan-accent">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Yetki Rolü & Sektör Birimi</label>
+                    <select id="login-role" class="w-full bg-aselsan-navy border border-aselsan-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-aselsan-accent">
+                        <option value="Kalite Kontrol Uzmanı">Kalite Kontrol Uzmanı (Sınıf 3 Muayene)</option>
+                        <option value="Kalite Güvence Başmühendisi">Kalite Güvence Başmühendisi (MRB & 8D)</option>
+                        <option value="SMD & Entegrasyon Hat Lideri">SMD & Entegrasyon Hat Lideri</option>
+                        <option value="SST Kalite Direktörü">SST Kalite Direktörü (Tam Yetki)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Parola / Şifre</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                        <input type="password" id="login-pass" required placeholder="••••••••" value="aselsan2026" 
+                               class="w-full bg-aselsan-navy border border-aselsan-border rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent focus:ring-1 focus:ring-aselsan-accent">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs pt-1 text-slate-400">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="remember-me" checked class="rounded bg-aselsan-navy border-slate-700 text-aselsan-accent">
+                        <span>Oturumu Hatırla</span>
+                    </label>
+                    <span class="text-sky-400 hover:underline cursor-pointer">PKI / Akıllı Kart Girişi</span>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 px-4 bg-aselsan-accent hover:bg-aselsan-hover text-white rounded-xl text-sm font-bold shadow-lg transition flex items-center justify-center gap-2 group mt-2">
+                    <i class="fa-solid fa-right-to-bracket transition group-hover:translate-x-0.5"></i>
+                    Sisteme Giriş Yap (SAP QM Portalı)
+                </button>
+            </form>
+
+            <!-- Quick Demo Login Presets -->
+            <div class="mt-5 pt-4 border-t border-aselsan-border">
+                <span class="text-[11px] font-semibold text-slate-400 block mb-2">Hızlı Test Girişleri (Tek Tıkla Doldur):</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button type="button" onclick="fillDemoUser('Furkan YAMAN', 'AS-9482', 'Kalite Güvence Başmühendisi')" 
+                            class="p-2 bg-aselsan-navy hover:bg-aselsan-hover border border-aselsan-border rounded-lg text-left transition flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                        <div class="truncate">
+                            <span class="font-bold text-white block truncate">Furkan YAMAN</span>
+                            <span class="text-[10px] text-slate-400">AS-9482 (Mühendis)</span>
+                        </div>
+                    </button>
+                    <button type="button" onclick="fillDemoUser('Ahmet Tunç', 'AS-8105', 'Kalite Kontrol Uzmanı')" 
+                            class="p-2 bg-aselsan-navy hover:bg-aselsan-hover border border-aselsan-border rounded-lg text-left transition flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <div class="truncate">
+                            <span class="font-bold text-white block truncate">Ahmet Tunç</span>
+                            <span class="text-[10px] text-slate-400">AS-8105 (Teknisyen)</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer note inside modal -->
+            <div class="mt-4 text-center">
+                <p class="text-[10px] text-slate-500">
+                    Gizlilik ve Bilgi Güvenliği Politikası uyarınca işlemler kayıt altındadır.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. ANA UYGULAMA PANELİ (DASHBOARD & KALİTE MODÜLLERİ)                     -->
+    <!-- ========================================================================= -->
+    <div id="app-view" class="hidden flex-1 flex flex-col">
+        <!-- Header & Top Bar -->
+        <header class="bg-aselsan-navy border-b border-aselsan-border sticky top-0 z-40 shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Brand Info -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl p-1.5 shadow-inner">
+                                <svg class="w-10 h-10 text-white" viewBox="0 0 100 100" fill="currentColor">
+                                    <path d="M50 8 L85 24 L85 64 L50 92 L15 64 L15 24 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round"/>
+                                    <path d="M50 18 L70 66 L58 66 L50 42 L42 66 L30 66 Z" fill="#FFFFFF"/>
+                                    <path d="M25 76 Q 50 62 75 76 Q 50 70 25 76 Z" fill="#38BDF8"/>
+                                </svg>
+                            </div>
+                            <div class="border-l border-slate-700/80 pl-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-2xl tracking-[0.15em] text-white font-tech">ASELSAN</span>
+                                    <span class="text-[9px] font-bold text-sky-400 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-800 tracking-wider">SECURING BEYOND</span>
+                                </div>
+                                <p class="text-xs text-slate-300 font-medium">Kalite Yönetim Direktörlüğü | Sayısal Muayene & SST Portalı</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Online Status & Logged In User Info -->
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="hidden xl:flex items-center gap-2 bg-aselsan-card border border-aselsan-border px-3.5 py-1.5 rounded-lg text-xs font-mono text-slate-200">
+                            <i class="fa-regular fa-clock text-sky-400"></i><span id="live-clock">--:--:--</span>
+                        </div>
+
+                        <!-- Active User Pill / Menu -->
+                        <div class="flex items-center gap-2.5 bg-aselsan-card border border-aselsan-border px-3 py-1.5 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-aselsan-accent text-white flex items-center justify-center text-xs font-bold font-mono shadow" id="user-avatar-initials">
+                                FY
+                            </div>
+                            <div class="text-left text-xs leading-tight hidden sm:block">
+                                <span class="font-bold text-white block" id="header-user-name">Furkan YAMAN</span>
+                                <span class="text-[10px] text-sky-300 font-mono" id="header-user-role">AS-9482 • Kalite Başmühendisi</span>
+                            </div>
+                            <!-- Logout Button -->
+                            <button onclick="handleLogout()" title="Oturumu Kapat" class="ml-1 p-1.5 text-slate-400 hover:text-rose-400 hover:bg-aselsan-navy rounded-lg transition">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-2.5 border-t border-aselsan-border text-sm scrollbar-none" id="nav-tabs">
+                    <button onclick="switchTab('dashboard')" class="tab-btn active px-3.5 py-1.5 rounded-lg font-medium transition flex items-center gap-2 bg-aselsan-accent text-white shadow-sm" data-target="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i> Yönetim Özeti (Dashboard)
+                    </button>
+                    <button onclick="switchTab('inspection')" class="tab-btn px-3.5 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-aselsan-hover" data-target="inspection">
+                        <i class="fa-solid fa-microchip"></i> Muayene Girişi (SMD / THT / Kablaj)
+                    </button>
+                    <button onclick="switchTab('ncr')" class="tab-btn px-3.5 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-aselsan-hover" data-target="ncr">
+                        <i class="fa-solid fa-shield-virus"></i> NCR & DÖF (MRB Süreci)
+                    </button>
+                    <button onclick="switchTab('checklist')" class="tab-btn px-3.5 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-aselsan-hover" data-target="checklist">
+                        <i class="fa-solid fa-clipboard-check"></i> IPC-A-610/620 Askeri Denetim Matrisi
+                    </button>
+                    <button onclick="switchTab('analytics')" class="tab-btn px-3.5 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-300 hover:text-white hover:bg-aselsan-hover" data-target="analytics">
+                        <i class="fa-solid fa-chart-column"></i> Pareto & Hata Analizi
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content Body -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <!-- ================= TAB 1: YÖNETİM ÖZETİ (DASHBOARD) ================= -->
+            <section id="tab-dashboard" class="space-y-6">
+                <!-- Strategic Defense Quality KPIs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- FPY Rate -->
+                    <div class="bg-aselsan-card border border-aselsan-border p-4 rounded-xl shadow relative overflow-hidden">
+                        <div class="text-[11px] text-slate-400 font-semibold tracking-wider uppercase">İlk Geçiş Verimi (FPY)</div>
+                        <div class="text-3xl font-extrabold text-emerald-400 font-tech mt-1" id="kpi-fpy">%98.4</div>
+                        <div class="text-[11px] text-slate-300 mt-1 flex items-center gap-1">
+                            <span class="text-emerald-400 font-bold">●</span> Askeri Hedef: %98.0+ (Sınıf 3)
+                        </div>
+                        <i class="fa-solid fa-check-double absolute right-3 bottom-2 text-emerald-950/40 text-4xl"></i>
+                    </div>
+
+                    <!-- Total Inspected Units -->
+                    <div class="bg-aselsan-card border border-aselsan-border p-4 rounded-xl shadow relative overflow-hidden">
+                        <div class="text-[11px] text-slate-400 font-semibold tracking-wider uppercase">Toplam Muayene</div>
+                        <div class="text-3xl font-extrabold text-white font-tech mt-1" id="kpi-total-inspections">0</div>
+                        <div class="text-[11px] text-sky-400 mt-1 flex items-center gap-1 font-medium">
+                            <i class="fa-solid fa-industry"></i> Aktif Vardiya & Hatlar
+                        </div>
+                        <i class="fa-solid fa-microscope absolute right-3 bottom-2 text-slate-800 text-4xl"></i>
+                    </div>
+
+                    <!-- Active NCRs -->
+                    <div class="bg-aselsan-card border border-aselsan-border p-4 rounded-xl shadow relative overflow-hidden">
+                        <div class="text-[11px] text-slate-400 font-semibold tracking-wider uppercase">Aktif Uygunsuzluk (NCR)</div>
+                        <div class="text-3xl font-extrabold text-rose-400 font-tech mt-1" id="kpi-active-ncr">0</div>
+                        <div class="text-[11px] text-rose-300 mt-1">MRB & Karantina Sürecinde</div>
+                        <i class="fa-solid fa-triangle-exclamation absolute right-3 bottom-2 text-rose-950/40 text-4xl"></i>
+                    </div>
+
+                    <!-- Open CAPA / DÖF -->
+                    <div class="bg-aselsan-card border border-aselsan-border p-4 rounded-xl shadow relative overflow-hidden">
+                        <div class="text-[11px] text-slate-400 font-semibold tracking-wider uppercase">Açık DÖF (8D/CAPA)</div>
+                        <div class="text-3xl font-extrabold text-amber-400 font-tech mt-1" id="kpi-open-capa">0</div>
+                        <div class="text-[11px] text-slate-300 mt-1">5 Neden analizi yürütülen</div>
+                        <i class="fa-solid fa-arrows-spin absolute right-3 bottom-2 text-amber-950/40 text-4xl"></i>
+                    </div>
+
+                    <!-- AS9102 FAI Rate -->
+                    <div class="bg-aselsan-card border border-aselsan-border p-4 rounded-xl shadow relative overflow-hidden">
+                        <div class="text-[11px] text-slate-400 font-semibold tracking-wider uppercase">FAI Doğrulama Oranı</div>
+                        <div class="text-3xl font-extrabold text-sky-400 font-tech mt-1" id="kpi-fai">%96.8</div>
+                        <div class="text-[11px] text-sky-300 mt-1">AS9102 Rev C Standart</div>
+                        <i class="fa-solid fa-award absolute right-3 bottom-2 text-sky-950/40 text-4xl"></i>
+                    </div>
+                </div>
+
+                <!-- Action Toolbar & Quick Actions -->
+                <div class="flex flex-wrap items-center justify-between gap-3 p-4 bg-aselsan-card border border-aselsan-border rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3.5 h-3.5 rounded-full bg-aselsan-accent"></span>
+                        <div>
+                            <h3 class="font-bold text-white text-sm">Elektronik & Aviyonik Üretim Hattı Denetimi</h3>
+                            <p class="text-[11px] text-slate-400">SMD Dizgi, Kablaj, THT ve Slip Ring İstasyonları Anlık Akışı</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="switchTab('inspection')" class="px-3.5 py-2 bg-aselsan-accent hover:bg-aselsan-hover text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-plus"></i> Yeni Muayene Kaydı
+                        </button>
+                        <button onclick="openNewNCRModal()" class="px-3.5 py-2 bg-rose-600/90 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-file-circle-exclamation"></i> Savunma NCR Aç
+                        </button>
+                        <button onclick="exportToCSV()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-2 transition">
+                            <i class="fa-solid fa-file-excel text-emerald-400"></i> Excel/CSV Aktar
+                        </button>
+                        <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-print"></i> Yazdır
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Defense Inspections Table -->
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl overflow-hidden shadow">
+                    <div class="p-4 border-b border-aselsan-border flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="font-bold text-white text-sm sm:text-base flex items-center gap-2">
+                                <i class="fa-solid fa-satellite-dish text-sky-400"></i>
+                                Kritik Proje Muayene ve Test Kayıtları
+                            </h3>
+                            <p class="text-xs text-slate-400">HİSAR, KORKUT, SARP, AVCI ve Denizaltı projeleri kalite onayları</p>
+                        </div>
+                        <span class="text-xs bg-aselsan-navy px-3 py-1 rounded-md text-sky-300 font-mono border border-aselsan-border" id="recent-count">0 Kayıt</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-aselsan-navy text-slate-300 font-semibold uppercase tracking-wider border-b border-aselsan-border">
+                                    <th class="py-3 px-4">Tarih</th>
+                                    <th class="py-3 px-4">Proje / Sistem</th>
+                                    <th class="py-3 px-4">Malzeme / Parça Kodu</th>
+                                    <th class="py-3 px-4">Seri No / SAP Sipariş</th>
+                                    <th class="py-3 px-4">Üretim Hattı / Aşama</th>
+                                    <th class="py-3 px-4">Standart</th>
+                                    <th class="py-3 px-4">Sonuç</th>
+                                    <th class="py-3 px-4">Hata Açıklaması</th>
+                                    <th class="py-3 px-4">Kalite Uzmanı</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-tbody" class="divide-y divide-aselsan-border/60 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 2: MUAYENE GİRİŞİ ================= -->
+            <section id="tab-inspection" class="hidden space-y-6">
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-6 shadow-md">
+                    <div class="border-b border-aselsan-border pb-4 mb-6 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-sky-400"></i>
+                                Elektronik & Aviyonik Donanım Muayene Giriş Formu
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">IPC-A-610G Sınıf 3 (Askeri / Yüksek Güvenilirlik) ve AS9100 Rev D standartlarına göre muayene kaydı</p>
+                        </div>
+                        <span class="text-[11px] bg-sky-950 text-sky-300 px-3 py-1 rounded border border-sky-800">
+                            SAP QM Modülü İle Eşleşir
+                        </span>
+                    </div>
+
+                    <form id="inspection-form" onsubmit="handleInspectionSubmit(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <!-- Project -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Savunma Projesi / Platform <span class="text-rose-400">*</span></label>
+                                <select id="inp-project" required class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-aselsan-accent">
+                                    <option value="KORKUT Hava Savunma">KORKUT - Kundağı Motorlu Hava Savunma</option>
+                                    <option value="HİSAR-A/O Hava Savunma">HİSAR - Hava Savunma Füze Sistemi</option>
+                                    <option value="SARP Uzaktan Komutalı Silah">SARP - UKSS Stabilize Silah Sistemi</option>
+                                    <option value="PYOM Denizaltı Torpido Kovanı">PYOM - Denizaltı Muharebe Yönetim</option>
+                                    <option value="AVCI Kaska Entegre Gösterge">AVCI - Kaska Entegre Kumanda Birimi</option>
+                                    <option value="ASELPOD Hedefleme Podu">ASELPOD - Elektro-Optik Keşif Podu</option>
+                                </select>
+                            </div>
+
+                            <!-- Station / Production Line -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">İstasyon / Üretim Hattı <span class="text-rose-400">*</span></label>
+                                <select id="inp-station" required class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-aselsan-accent">
+                                    <option value="SMD Dizgi Hattı 1 (AOI & X-Ray)">SMD Dizgi Hattı 1 (AOI & X-Ray)</option>
+                                    <option value="SMD Dizgi Hattı 2 (BGA/QFN Montaj)">SMD Dizgi Hattı 2 (BGA/QFN Montaj)</option>
+                                    <option value="THT Manuel Lehimleme Tezgahı">THT Manuel Lehimleme Tezgahı</option>
+                                    <option value="Kablaj / Askeri Harness Örgü Tezgahı">Kablaj / Askeri Harness Örgü Tezgahı</option>
+                                    <option value="Slip Ring Elektriksel Test İstasyonu">Slip Ring Elektriksel Test İstasyonu</option>
+                                    <option value="Mekanik Entegrasyon & Torklama">Mekanik Entegrasyon & Torklama</option>
+                                    <option value="Son Muayene & FAI Doğrulama">Son Muayene & FAI Doğrulama</option>
+                                </select>
+                            </div>
+
+                            <!-- Part Number -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Malzeme / Parça Kodu <span class="text-rose-400">*</span></label>
+                                <input type="text" id="inp-part-code" required placeholder="Örn: 242-0199-04 (RF Kartı)" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                            </div>
+
+                            <!-- Serial Number -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Seri No / Askeri Barkod <span class="text-rose-400">*</span></label>
+                                <input type="text" id="inp-serial-no" required placeholder="Örn: SN-AS26-89401" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                            </div>
+
+                            <!-- Work Order / SAP QM -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">SAP QM İş Emri No <span class="text-rose-400">*</span></label>
+                                <input type="text" id="inp-work-order" required placeholder="Örn: QM-884012" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                            </div>
+
+                            <!-- Standard Applied -->
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Uygulanan Standart & Kriter <span class="text-rose-400">*</span></label>
+                                <select id="inp-standard" required class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-aselsan-accent">
+                                    <option value="IPC-A-610G Sınıf 3 (Yüksek Güvenilirlik)">IPC-A-610G Sınıf 3 (Yüksek Güvenilirlik / Askeri)</option>
+                                    <option value="IPC/WHMA-A-620 Sınıf 3 (Kablo/Harness)">IPC/WHMA-A-620 Sınıf 3 (Kablolama & Demet)</option>
+                                    <option value="AS9100 Rev D & AS9102 (FAI)">AS9100 Rev D & AS9102 (İlk Ürün Denetimi)</option>
+                                    <option value="MIL-STD-810G (Çevresel Şartlar)">MIL-STD-810G (Çevresel Test ve Dayanım)</option>
+                                    <option value="ASELSAN TBDK Çizim Toleransı">ASELSAN TBDK & Mekanik Tolerans</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Result Decision & Defect Details -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 p-4 rounded-xl bg-aselsan-navy border border-aselsan-border">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Muayene Kararı <span class="text-rose-400">*</span></label>
+                                <select id="inp-result" onchange="toggleDefectFields()" required class="w-full bg-aselsan-dark border border-aselsan-border rounded-lg px-3.5 py-2 text-sm font-bold text-white focus:outline-none focus:border-aselsan-accent">
+                                    <option value="Kabul" class="text-emerald-400">✓ KABUL (Standartlara Tam Uyumlu)</option>
+                                    <option value="Şartlı Kabul" class="text-amber-400">⚠ ŞARTLI KABUL (MRB Sapma İzni ile)</option>
+                                    <option value="Ret" class="text-rose-400">✕ RET (NCR & Karantina Gerektirir)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Hata Kodu / Tipi (Ret / Şartlı ise)</label>
+                                <select id="inp-defect-code" class="w-full bg-aselsan-dark border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-aselsan-accent">
+                                    <option value="Yok (Hatasız)">Kusursuz / Hata Yok</option>
+                                    <option value="Lehim Köprüsü (IPC 610 §5.2.7)">Lehim Köprüsü (Solder Bridge)</option>
+                                    <option value="Yetersiz Lehim Dolgusu / Soğuk Lehim">Yetersiz Lehim Dolgusu / Soğuk Lehim</option>
+                                    <option value="Tombstone / Mezar Taşı Etkisi">Tombstone / Komponent Dikilmesi</option>
+                                    <option value="Ters Polarite / Yanlış Yönlendirme">Ters Polarite / Yanlış Yönlendirme</option>
+                                    <option value="Kablo Krimp Çekme Kuvveti Düşüklüğü">Kablo Krimp Çekme Kuvveti Düşüklüğü</option>
+                                    <option value="Slip Ring İzolasyon Direnci Düşük">Slip Ring İzolasyon Direnci Hatası</option>
+                                    <option value="Mekanik Tork Değeri Tolerans Dışı">Mekanik Tork Değeri Tolerans Dışı</option>
+                                    <option value="BGA Void Oranı > %25 (X-Ray)">BGA Void Oranı > %25 (X-Ray Tespit)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Hata Lokasyonu / Detay</label>
+                                <input type="text" id="inp-defect-detail" placeholder="Örn: U4 FPGA bacak 18-19 köprü / J3 soketi" class="w-full bg-aselsan-dark border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                            </div>
+                        </div>
+
+                        <!-- Inspector and Notes -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Muayene Uzmanı (Aktif Kullanıcı) <span class="text-rose-400">*</span></label>
+                                <input type="text" id="inp-inspector" readonly required class="w-full bg-aselsan-dark border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-sky-300 font-medium focus:outline-none cursor-not-allowed">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Kalite Gözlemleri & Ölçüm Rapor Notu</label>
+                                <input type="text" id="inp-notes" placeholder="Mikroskop 40x inceleme, optik karşılaştırıcı ve torkmetre kalibrasyon kontrolü tamamlandı." class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-3 border-t border-aselsan-border">
+                            <button type="reset" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition">
+                                Formu Temizle
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-aselsan-accent hover:bg-aselsan-hover text-white text-xs font-bold rounded-lg flex items-center gap-2 transition shadow">
+                                <i class="fa-solid fa-floppy-disk"></i> Muayene Kaydını Sisteme İşle (SAP QM)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ================= TAB 3: NCR & DÖF (MRB SÜRECİ) ================= -->
+            <section id="tab-ncr" class="hidden space-y-6">
+                <!-- Filter Bar -->
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <!-- Search Input -->
+                        <div class="relative w-full sm:w-64">
+                            <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+                            <input type="text" id="ncr-search" oninput="renderNCRTable()" placeholder="NCR No, Proje veya Parça ara..." class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-aselsan-accent">
+                        </div>
+                        <!-- Severity Filter -->
+                        <select id="ncr-filter-severity" onchange="renderNCRTable()" class="bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+                            <option value="ALL">Tüm Şiddet Dereceleri</option>
+                            <option value="Kritik">Kritik (Güvenlik / Görev Riski)</option>
+                            <option value="Majör">Majör (Fonksiyon Etkisi)</option>
+                            <option value="Minör">Minör (İkincil / Kozmetik)</option>
+                        </select>
+                        <!-- Status Filter -->
+                        <select id="ncr-filter-status" onchange="renderNCRTable()" class="bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+                            <option value="ALL">Tüm Durumlar</option>
+                            <option value="Açık (Karantinada)">Açık (Karantinada)</option>
+                            <option value="MRB İncelemesinde">MRB İncelemesinde</option>
+                            <option value="DÖF / 8D Açıldı">DÖF / 8D Açıldı</option>
+                            <option value="Kapatıldı">Kapatıldı</option>
+                        </select>
+                    </div>
+
+                    <button onclick="openNewNCRModal()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-2 transition shadow">
+                        <i class="fa-solid fa-plus"></i> Yeni NCR / Uygunsuzluk Aç
+                    </button>
+                </div>
+
+                <!-- NCR Table -->
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl overflow-hidden shadow">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-aselsan-navy text-slate-300 font-semibold uppercase tracking-wider border-b border-aselsan-border">
+                                    <th class="py-3 px-4">NCR No</th>
+                                    <th class="py-3 px-4">Tarih</th>
+                                    <th class="py-3 px-4">Savunma Projesi</th>
+                                    <th class="py-3 px-4">Malzeme / Parça No</th>
+                                    <th class="py-3 px-4">Şiddet Derecesi</th>
+                                    <th class="py-3 px-4">Uygunsuzluk Tanımı</th>
+                                    <th class="py-3 px-4">Sorumlu Birim</th>
+                                    <th class="py-3 px-4">Durum</th>
+                                    <th class="py-3 px-4 text-center">8D / Kök Neden</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ncr-tbody" class="divide-y divide-aselsan-border/60 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 4: ASKERİ DENETİM KONTROL LİSTESİ ================= -->
+            <section id="tab-checklist" class="hidden space-y-6">
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-6 shadow">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-aselsan-border pb-4">
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-sky-400"></i>
+                                IPC-A-610G Sınıf 3 / IPC-620 Askeri Denetim Matrisi
+                            </h2>
+                            <p class="text-xs text-slate-400">Savunma elektroniği ve kablaj donanımları için standart kalite doğrulama maddeleri</p>
+                        </div>
+
+                        <!-- Live Quality Audit Score -->
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block font-medium">Askeri Uyumluluk Skoru:</span>
+                                <span class="text-2xl font-extrabold text-emerald-400 font-tech" id="checklist-score">%100</span>
+                            </div>
+                            <button onclick="resetChecklist()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold border border-slate-700">
+                                Matrisi Sıfırla
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checklist Items Container -->
+                    <div class="mt-6 space-y-3" id="checklist-container">
+                        <!-- Dynamic rendering in JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 5: RAPORLAR & PARETO ANALİZİ ================= -->
+            <section id="tab-analytics" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Defect Breakdown Chart (Pareto-style) -->
+                    <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-5 shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-column text-sky-400"></i>
+                                    Hata Türü Pareto Dağılımı (Sınıf 3)
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Elektronik üretimde en sık karşılaşılan uygunsuzluk tipleri</p>
+                            </div>
+                            <span class="text-xs text-slate-400 bg-aselsan-navy px-2.5 py-1 rounded border border-aselsan-border">Son 30 Gün</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="chart-defect-type"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Project Breakdown Chart -->
+                    <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-5 shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-pie text-emerald-400"></i>
+                                    Proje Bazlı Muayene Hacmi Dağılımı
+                                </h3>
+                                <p class="text-[11px] text-slate-400">HİSAR, KORKUT, SARP, Denizaltı & Aviyonik</p>
+                            </div>
+                            <span class="text-xs text-slate-400 bg-aselsan-navy px-2.5 py-1 rounded border border-aselsan-border">Canlı Veri</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="chart-project-distribution"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AS9100 / Defense Quality Assurance Policy Card -->
+                <div class="bg-aselsan-card border border-aselsan-border rounded-xl p-5 shadow">
+                    <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-certificate text-amber-400"></i>
+                        ASELSAN Sıfır Hata (Zero Defect) ve Sürekli İyileştirme Politikası
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Tüm elektronik dizgi (SMD/THT), aviyonik kablaj ve mekanik entegrasyon süreçlerinde 
+                        <strong>IPC-A-610G Sınıf 3</strong> ve <strong>AS9100 Rev D</strong> kuralları tavizsiz uygulanmaktadır. 
+                        Ret alan her donanım için SAP QM üzerinden otomatik karantina kaydı oluşturulur ve MRB (Malzeme Değerlendirme Kurulu) 
+                        onayı olmadan üretim akışına dahil edilemez. 5 Neden ve 8D kök neden analizleri savunma sanayi izlenebilirliğini teminat altına alır.
+                    </p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer with Furkan YAMAN's Signature & Copyright -->
+        <footer class="bg-aselsan-navy border-t border-aselsan-border mt-auto py-5 text-center text-xs text-slate-400">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <span class="font-medium text-slate-200">
+                    © 2026 ASELSAN Elektronik Sanayi ve Ticaret A.Ş. — Kalite Yönetim Direktörlüğü - Furkan YAMAN'a aittir.
+                </span>
+                <span class="text-slate-400 font-mono text-[11px]">
+                    SST Sektör Başkanlığı | Sayısal Muayene & Kalite Güvence Portalı (NATO AQAP-2110 / AS9100D)
+                </span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ================= MODAL: 5-WHY & 8D NCR DETAYI ================= -->
+    <div id="ncr-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-aselsan-card border border-aselsan-border w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 bg-aselsan-navy border-b border-aselsan-border flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                    <h3 class="font-bold text-white text-sm sm:text-base font-tech tracking-wide" id="modal-ncr-title">ASELSAN 8D & Kök Neden Analizi</h3>
+                </div>
+                <button onclick="closeNCRDetailModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4 overflow-y-auto text-xs text-slate-300">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-aselsan-navy rounded-xl border border-aselsan-border">
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Proje:</span>
+                        <span class="font-bold text-white" id="modal-project">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Malzeme Kodu:</span>
+                        <span class="font-mono text-sky-400 font-bold" id="modal-part">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Seri / Lot:</span>
+                        <span class="font-mono text-slate-200" id="modal-serial">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Şiddet Derecesi:</span>
+                        <span class="font-bold" id="modal-severity">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Sorumlu Birim:</span>
+                        <span class="font-semibold text-slate-200" id="modal-dept">-</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[11px]">Mevcut Durum:</span>
+                        <span class="font-bold text-amber-400" id="modal-status">-</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-wider">Hata & Uygunsuzluk Tanımı</h4>
+                    <p class="p-3 bg-aselsan-navy rounded-lg text-slate-200 border border-aselsan-border font-medium" id="modal-desc">-</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-sitemap text-sky-400"></i> 5-Neden (5-Why) Kök Neden Analizi
+                    </h4>
+                    <div class="p-3 bg-aselsan-navy rounded-lg text-slate-200 border border-aselsan-border space-y-1.5" id="modal-root-cause">
+                        <!-- Populated -->
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-xs mb-1 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-wrench text-emerald-400"></i> Alınan DÖF & Önleyici Faaliyet (CAPA)
+                    </h4>
+                    <p class="p-3 bg-aselsan-navy rounded-lg text-emerald-300 border border-aselsan-border" id="modal-capa-action">-</p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-aselsan-navy border-t border-aselsan-border flex justify-end gap-2">
+                <button onclick="closeNCRDetailModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-semibold">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: CREATE NEW NCR ================= -->
+    <div id="new-ncr-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-aselsan-card border border-aselsan-border w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 bg-aselsan-navy border-b border-aselsan-border flex items-center justify-between">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Yeni Savunma NCR / Uygunsuzluk Kaydı
+                </h3>
+                <button onclick="closeNewNCRModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="new-ncr-form" onsubmit="handleNewNCRSubmit(event)" class="p-6 space-y-4 overflow-y-auto text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-slate-300 mb-1">Proje / Sistem *</label>
+                        <select id="ncr-new-project" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white">
+                            <option value="HİSAR Hava Savunma">HİSAR Hava Savunma</option>
+                            <option value="KORKUT Hava Savunma">KORKUT Hava Savunma</option>
+                            <option value="SARP UKSS">SARP UKSS</option>
+                            <option value="PYOM Denizaltı">PYOM Denizaltı</option>
+                            <option value="AVCI Kask Göstergesi">AVCI Kask Göstergesi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-300 mb-1">Malzeme / Parça Kodu *</label>
+                        <input type="text" id="ncr-new-part" required placeholder="Örn: 242-0199-04" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-slate-300 mb-1">Seri / Lot No *</label>
+                        <input type="text" id="ncr-new-lot" required placeholder="Örn: SN-AS26-904" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-300 mb-1">Şiddet Derecesi *</label>
+                        <select id="ncr-new-severity" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white">
+                            <option value="Kritik">Kritik (Güvenlik / Görev Riski)</option>
+                            <option value="Majör">Majör (Fonksiyon veya Montaj Etkisi)</option>
+                            <option value="Minör">Minör (Kozmetik / İkincil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">Sorumlu Birim / Departman *</label>
+                    <input type="text" id="ncr-new-owner" required placeholder="Örn: Mikroelektronik Üretim Müh. / Ali Kaya" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">Uygunsuzluk Tanımı *</label>
+                    <textarea id="ncr-new-desc" required rows="2" placeholder="Tespit edilen kusurun IPC / Teknik resim standardı kapsamındaki net tanımı..." class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">İlk Kök Neden & 5-Neden Girişi</label>
+                    <textarea id="ncr-new-root" rows="2" placeholder="Neden 1: ..., Neden 2: ... Şeklinde kök neden özeti" class="w-full bg-aselsan-navy border border-aselsan-border rounded-lg px-3 py-2 text-white"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2 border-t border-aselsan-border">
+                    <button type="button" onclick="closeNewNCRModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg font-semibold">
+                        İptal
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold">
+                        NCR Kaydı Oluştur & MRB'ye Sevk Et
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT APPLICATION CORE ================= -->
+    <script>
+        // Seed Realistic Defense Production Data for ASELSAN
+        const DEFAULT_ASELSAN_INSPECTIONS = [
+            {
+                id: 'INS-2026-904',
+                timestamp: '2026-11-10 16:45',
+                project: 'HİSAR-A/O Hava Savunma',
+                station: 'SMD Dizgi Hattı 1 (AOI & X-Ray)',
+                partCode: '242-0881-01 (RF Modül Kartı)',
+                serialNo: 'SN-HSR-26-092',
+                workOrder: 'QM-774019',
+                standard: 'IPC-A-610G Sınıf 3 (Yüksek Güvenilirlik)',
+                result: 'Kabul',
+                defectCode: 'Yok (Hatasız)',
+                defectDetail: '-',
+                inspector: 'Furkan YAMAN (AS-9482)',
+                notes: 'AOI ve X-Ray BGA void analizi %12 ile nominal (Max: %25)'
+            },
+            {
+                id: 'INS-2026-903',
+                timestamp: '2026-11-10 15:20',
+                project: 'KORKUT Hava Savunma',
+                station: 'THT Manuel Lehimleme Tezgahı',
+                partCode: '184-0412-09 (Güç Dağıtım)',
+                serialNo: 'SN-KKT-26-441',
+                workOrder: 'QM-774012',
+                standard: 'IPC-A-610G Sınıf 3 (Yüksek Güvenilirlik)',
+                result: 'Ret',
+                defectCode: 'Lehim Köprüsü (IPC 610 §5.2.7)',
+                defectDetail: 'U7 güç transistörü bacak 1-2 arasında lehim köprüsü',
+                inspector: 'Ahmet Tunç (AS-8105)',
+                notes: 'Mikroskop 30x incelemede saptandı. NCR açıldı.'
+            },
+            {
+                id: 'INS-2026-902',
+                timestamp: '2026-11-10 14:10',
+                project: 'PYOM Denizaltı Torpido Kovanı',
+                station: 'Kablaj / Askeri Harness Örgü Tezgahı',
+                partCode: 'HARN-PYOM-044 (MIL-DTL-38999)',
+                serialNo: 'LOT-PY-9801',
+                workOrder: 'QM-773998',
+                standard: 'IPC/WHMA-A-620 Sınıf 3 (Kablo/Harness)',
+                result: 'Kabul',
+                defectCode: 'Yok (Hatasız)',
+                defectDetail: '-',
+                inspector: 'Furkan YAMAN (AS-9482)',
+                notes: 'Krimp çekme kuvveti 180N (Şartname min: 140N). İzolasyon testi 500VDC uygun.'
+            },
+            {
+                id: 'INS-2026-901',
+                timestamp: '2026-11-10 11:30',
+                project: 'SARP Uzaktan Komutalı Silah',
+                station: 'Slip Ring Elektriksel Test İstasyonu',
+                partCode: 'SLP-552-01 (Kule Slip Ring)',
+                serialNo: 'SN-SRP-26-104',
+                workOrder: 'QM-773950',
+                standard: 'ASELSAN TBDK Çizim Toleransı',
+                result: 'Şartlı Kabul',
+                defectCode: 'Mekanik Tork Değeri Tolerans Dışı',
+                defectDetail: 'Dönme başlangıç torku 1.2 Nm (Spec: 1.0 ± 0.1 Nm)',
+                inspector: 'Furkan YAMAN (AS-9482)',
+                notes: 'MRB-2026-88 no ile 5 çevrim sonrası rodaj onaylandı.'
+            },
+            {
+                id: 'INS-2026-900',
+                timestamp: '2026-11-10 09:15',
+                project: 'AVCI Kaska Entegre Gösterge',
+                station: 'Son Muayene & FAI Doğrulama',
+                partCode: 'OP-DISP-088 (Mikro Ekran Modülü)',
+                serialNo: 'SN-AVC-26-009',
+                workOrder: 'QM-773910',
+                standard: 'AS9100 Rev D & AS9102 (FAI)',
+                result: 'Kabul',
+                defectCode: 'Yok (Hatasız)',
+                defectDetail: '-',
+                inspector: 'Murat Kara (AS-6120)',
+                notes: 'AS9102 Form 1, Form 2 ve Form 3 onaylı FAI teslimatı.'
+            }
+        ];
+
+        // Seed Realistic Defense NCR & 8D Data
+        const DEFAULT_ASELSAN_NCRS = [
+            {
+                id: 'NCR-2026-044',
+                date: '2026-11-10',
+                project: 'KORKUT Hava Savunma',
+                partCode: '184-0412-09',
+                serialNo: 'SN-KKT-26-441',
+                severity: 'Kritik',
+                status: 'Açık (Karantinada)',
+                desc: 'U7 güç transistörü bacakları arasında lehim köprüsü sebebiyle 28V güç hattında şasiye kısa devre.',
+                rootCause: '1. Neden: Manuel lehimleme sırasında aşırı lehim teli beslendi.<br>2. Neden: Havya ucu sıcaklığı nominalden 15°C düşük seçilmiş.<br>3. Neden: Operatör havya istasyonu kalibrasyon doğrulamasını vardiya başında yapmamış.',
+                capaAction: 'DÖF-8D-2026-12 açıldı. Havya istasyonlarına dijital sıcaklık kilit sistemi takılacak, operatöre IPC-A-610G Sınıf 3 yenileme eğitimi tanımlandı.',
+                responsible: 'Furkan YAMAN (Kalite Başmühendisi)'
+            },
+            {
+                id: 'NCR-2026-043',
+                date: '2026-11-09',
+                project: 'SARP Uzaktan Komutalı Silah',
+                partCode: 'SLP-552-01',
+                serialNo: 'SN-SRP-26-089',
+                severity: 'Majör',
+                status: 'MRB İncelemesinde',
+                desc: 'Slip ring gövdesinde conta yuvası talaşlı imalat derinliği teknik çizim toleransından +0.08mm sapma göstermiş.',
+                rootCause: 'CNC freze takım aşınma kompanzasyonu geç girilmiş.',
+                capaAction: 'MRB Heyeti (Tasarım + Kalite + Üretim) sapma incelemesinde. Sızdırmazlık IP67 testine tabi tutulacak.',
+                responsible: 'Murat Kara (Mekanik Kalite)'
+            },
+            {
+                id: 'NCR-2026-042',
+                date: '2026-11-07',
+                project: 'HİSAR-A/O Hava Savunma',
+                partCode: '242-0881-01',
+                serialNo: 'SN-HSR-26-075',
+                severity: 'Minör',
+                status: 'Kapatıldı',
+                desc: 'RF ekranlama kapağı kenarında mikron düzeyinde lehim sıçraması (Solder Splash).',
+                rootCause: 'Azotlu lehimleme fırınında lehim pastası ön ısıtma profili (soak time) 4 saniye kısa kalmış.',
+                capaAction: 'Profil eğrisi fırın yazılımında güncellendi. Temizlik yapıldı ve teslim edildi.',
+                responsible: 'Furkan YAMAN (Kalite Başmühendisi)'
+            }
+        ];
+
+        // Defense IPC Sınıf 3 Checklist
+        const DEFAULT_ASELSAN_CHECKLIST = [
+            { id: 'c1', cat: 'IPC-A-610G §5.2', title: 'Lehim Islanma Açısı & İçbükey Menisküs', desc: 'Lehim birleşimi 90 dereceden küçük bir ıslanma açısına ve parlak, düzgün içbükey menisküse sahip olmalıdır (Sınıf 3 Askeri).', passed: true },
+            { id: 'c2', cat: 'IPC-A-610G §5.2.7', title: 'Lehim Köprüsü & Çapak Yokluğu', desc: 'Bitişik bacaklar veya iletken hatlar arasında kesinlikle lehim köprüsü ve metalik partikül kabul edilemez.', passed: true },
+            { id: 'c3', cat: 'IPC-A-610G §8.3', title: 'Komponent Hizalama & Ters Polarite', desc: 'Tüm polariteli komponentler (entegreler, tantal kondansatörler vb.) yönlendirme ve ofset kriterlerine tam uymalıdır.', passed: true },
+            { id: 'c4', cat: 'IPC/WHMA-A-620', title: 'Askeri Kablaj & Krimp Çekme Mukavemeti', desc: 'MIL-DTL konnektör krimp soketleri IPC-620 çekme testinden hatasız geçmeli, izolasyon sıyrılması olmamalıdır.', passed: true },
+            { id: 'c5', cat: 'X-Ray Denetimi', title: 'BGA / QFN Lehim Boşluğu (Void Rate) < %25', desc: 'Kritik BGA lehim toplarında X-Ray görüntüleme ile ölçülen toplam boşluk alanı %25 altında kalmalıdır.', passed: true },
+            { id: 'c6', cat: 'AS9100 / ESD', title: 'ESD Alanı ve İyonik Kontaminasyon Sınırı', desc: 'EPA alanında topraklama doğrulaması yapılmış, kart yüzeyi MIL-STD fluks temizliği testini geçmiş olmalıdır.', passed: true }
+        ];
+
+        let inspections = [];
+        let ncrs = [];
+        let checklist = [];
+        let defectChart = null;
+        let projectChart = null;
+        let currentUser = null;
+
+        window.onload = function() {
+            inspections = JSON.parse(localStorage.getItem('aselsan_inspections')) || DEFAULT_ASELSAN_INSPECTIONS;
+            ncrs = JSON.parse(localStorage.getItem('aselsan_ncrs')) || DEFAULT_ASELSAN_NCRS;
+            checklist = JSON.parse(localStorage.getItem('aselsan_checklist')) || DEFAULT_ASELSAN_CHECKLIST;
+
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Check existing session
+            const savedUser = localStorage.getItem('aselsan_active_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                applyAuthenticatedSession(currentUser);
+            } else {
+                showLoginScreen();
+            }
+        };
+
+        function fillDemoUser(name, sicil, role) {
+            document.getElementById('login-name').value = name;
+            document.getElementById('login-sicil').value = sicil;
+            document.getElementById('login-role').value = role;
+            document.getElementById('login-pass').value = 'aselsan2026';
+            showToast(`${name} demo bilgileri forma yüklendi.`, 'info');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const sicil = document.getElementById('login-sicil').value.trim();
+            const role = document.getElementById('login-role').value;
+            const remember = document.getElementById('remember-me').checked;
+
+            currentUser = {
+                name: name,
+                sicil: sicil,
+                role: role,
+                loginTime: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            if (remember) {
+                localStorage.setItem('aselsan_active_user', JSON.stringify(currentUser));
+            }
+
+            applyAuthenticatedSession(currentUser);
+            showToast(`Hoş geldiniz Sn. ${currentUser.name}! Güvenli oturum açıldı.`, 'success');
+        }
+
+        function applyAuthenticatedSession(user) {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+
+            // Set user initials
+            const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('user-avatar-initials').innerText = initials || 'AS';
+            document.getElementById('header-user-name').innerText = user.name;
+            document.getElementById('header-user-role').innerText = `${user.sicil} • ${user.role}`;
+
+            // Sync with Inspection Form Inspector Input
+            const inspectorInp = document.getElementById('inp-inspector');
+            if (inspectorInp) {
+                inspectorInp.value = `${user.name} (${user.sicil})`;
+            }
+
+            refreshAllData();
+            initCharts();
+            renderChecklist();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('aselsan_active_user');
+            currentUser = null;
+            document.getElementById('app-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            showToast('Oturum kapatıldı. İyi çalışmalar.', 'info');
+        }
+
+        function showLoginScreen() {
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('app-view').classList.add('hidden');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + 
+                            now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) clockEl.innerText = dateStr;
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'inspection', 'ncr', 'checklist', 'analytics'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.add('hidden');
+            });
+
+            const activeSection = document.getElementById(`tab-${tabId}`);
+            if (activeSection) activeSection.classList.remove('hidden');
+
+            const buttons = document.querySelectorAll('#nav-tabs .tab-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-target') === tabId) {
+                    btn.classList.add('bg-aselsan-accent', 'text-white');
+                    btn.classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-aselsan-hover');
+                } else {
+                    btn.classList.remove('bg-aselsan-accent', 'text-white');
+                    btn.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-aselsan-hover');
+                }
+            });
+
+            if (tabId === 'analytics') {
+                setTimeout(updateChartsData, 100);
+            }
+        }
+
+        function toggleDefectFields() {
+            const res = document.getElementById('inp-result').value;
+            const defectSelect = document.getElementById('inp-defect-code');
+            const defectDetail = document.getElementById('inp-defect-detail');
+            if (res === 'Kabul') {
+                defectSelect.value = 'Yok (Hatasız)';
+                defectDetail.value = '';
+                defectSelect.disabled = true;
+                defectDetail.disabled = true;
+            } else {
+                defectSelect.disabled = false;
+                defectDetail.disabled = false;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-aselsan-accent';
+            if (type === 'error') bgClass = 'bg-rose-600';
+            if (type === 'warning') bgClass = 'bg-amber-600';
+            if (type === 'success') bgClass = 'bg-emerald-600';
+            if (type === 'info') bgClass = 'bg-sky-600';
+            
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 border border-white/20`;
+            toast.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'circle-check' : (type === 'info' ? 'circle-info' : 'triangle-exclamation')}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function handleInspectionSubmit(e) {
+            e.preventDefault();
+
+            const result = document.getElementById('inp-result').value;
+            const defectCode = result === 'Kabul' ? 'Yok (Hatasız)' : document.getElementById('inp-defect-code').value;
+            const defectDetail = result === 'Kabul' ? '-' : (document.getElementById('inp-defect-detail').value.trim() || '-');
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR') + ' ' + now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+            const inspectorVal = currentUser ? `${currentUser.name} (${currentUser.sicil})` : 'Furkan YAMAN (AS-9482)';
+
+            const newRecord = {
+                id: 'INS-2026-' + Math.floor(900 + Math.random() * 99),
+                timestamp: dateStr,
+                project: document.getElementById('inp-project').value,
+                station: document.getElementById('inp-station').value,
+                partCode: document.getElementById('inp-part-code').value.trim(),
+                serialNo: document.getElementById('inp-serial-no').value.trim(),
+                workOrder: document.getElementById('inp-work-order').value.trim(),
+                standard: document.getElementById('inp-standard').value,
+                result: result,
+                defectCode: defectCode,
+                defectDetail: defectDetail,
+                inspector: inspectorVal,
+                notes: document.getElementById('inp-notes').value.trim() || '-'
+            };
+
+            inspections.unshift(newRecord);
+            saveData();
+            refreshAllData();
+
+            if (result === 'Ret') {
+                showToast(`Muayene RET kaydedildi! Otomatik Savunma NCR açılması önerilir.`, 'error');
+            } else if (result === 'Şartlı Kabul') {
+                showToast(`Şartlı Kabul girildi. MRB dosya onayı bekleniyor.`, 'warning');
+            } else {
+                showToast(`Kayıt (${newRecord.id}) SAP QM sistemine başarıyla işlendi.`, 'success');
+            }
+
+            document.getElementById('inspection-form').reset();
+            document.getElementById('inp-inspector').value = inspectorVal;
+            toggleDefectFields();
+            switchTab('dashboard');
+        }
+
+        function refreshAllData() {
+            const totalInspections = inspections.length;
+            const totalPassed = inspections.filter(i => i.result === 'Kabul').length;
+            const fpy = totalInspections > 0 ? ((totalPassed / totalInspections) * 100).toFixed(1) : '100.0';
+
+            const activeNCRs = ncrs.filter(n => n.status !== 'Kapatıldı').length;
+            const openCAPAs = ncrs.filter(n => n.status.includes('DÖF') || n.status.includes('Kök Neden') || n.status.includes('Açık')).length;
+
+            document.getElementById('kpi-total-inspections').innerText = totalInspections;
+            document.getElementById('kpi-fpy').innerText = `%${fpy}`;
+            document.getElementById('kpi-active-ncr').innerText = activeNCRs;
+            document.getElementById('kpi-open-capa').innerText = openCAPAs;
+            document.getElementById('recent-count').innerText = `${totalInspections} Kayıt`;
+
+            // Render Recent Table
+            const recentTbody = document.getElementById('dashboard-recent-tbody');
+            if (recentTbody) {
+                recentTbody.innerHTML = '';
+                const sliceData = inspections.slice(0, 8);
+
+                if (sliceData.length === 0) {
+                    recentTbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Kayıtlı muayene verisi bulunmuyor.</td></tr>`;
+                } else {
+                    sliceData.forEach(item => {
+                        let badgeColor = 'bg-emerald-950/90 text-emerald-300 border border-emerald-800';
+                        if (item.result === 'Şartlı Kabul') badgeColor = 'bg-amber-950/90 text-amber-300 border border-amber-800';
+                        if (item.result === 'Ret') badgeColor = 'bg-rose-950/90 text-rose-300 border border-rose-800 font-bold';
+
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-aselsan-hover/40 transition';
+                        tr.innerHTML = `
+                            <td class="py-2.5 px-4 font-mono text-slate-400 text-[11px]">${item.timestamp}</td>
+                            <td class="py-2.5 px-4 font-semibold text-white">${item.project.split(' ')[0]} <span class="text-slate-400 text-[10px] block">${item.project.split(' ').slice(1).join(' ')}</span></td>
+                            <td class="py-2.5 px-4 font-mono text-sky-300">${item.partCode}</td>
+                            <td class="py-2.5 px-4 font-mono text-slate-300">${item.serialNo} <span class="text-[10px] text-slate-500 block">${item.workOrder}</span></td>
+                            <td class="py-2.5 px-4 text-slate-300">${item.station.split('(')[0]}</td>
+                            <td class="py-2.5 px-4 text-slate-400 text-[11px]">${item.standard.split(' ')[0]}</td>
+                            <td class="py-2.5 px-4">
+                                <span class="px-2 py-0.5 rounded text-[11px] ${badgeColor}">
+                                    ${item.result}
+                                </span>
+                            </td>
+                            <td class="py-2.5 px-4 text-slate-300 max-w-xs truncate" title="${item.defectDetail}">
+                                ${item.result === 'Kabul' ? '<span class="text-emerald-400/80">Kusursuz (Sınıf 3)</span>' : item.defectCode}
+                            </td>
+                            <td class="py-2.5 px-4 text-slate-300">${item.inspector.split(' ')[0]} ${item.inspector.split(' ')[1] || ''}</td>
+                        `;
+                        recentTbody.appendChild(tr);
+                    });
+                }
+            }
+
+            renderNCRTable();
+        }
+
+        function renderNCRTable() {
+            const tbody = document.getElementById('ncr-tbody');
+            if (!tbody) return;
+
+            const searchQuery = (document.getElementById('ncr-search')?.value || '').toLowerCase();
+            const sevFilter = document.getElementById('ncr-filter-severity')?.value || 'ALL';
+            const statFilter = document.getElementById('ncr-filter-status')?.value || 'ALL';
+
+            const filtered = ncrs.filter(n => {
+                const matchSearch = n.id.toLowerCase().includes(searchQuery) || 
+                                    n.project.toLowerCase().includes(searchQuery) ||
+                                    n.partCode.toLowerCase().includes(searchQuery) ||
+                                    n.desc.toLowerCase().includes(searchQuery);
+                const matchSev = sevFilter === 'ALL' || n.severity === sevFilter;
+                const matchStat = statFilter === 'ALL' || n.status === statFilter;
+                return matchSearch && matchSev && matchStat;
+            });
+
+            tbody.innerHTML = '';
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Arama kriterine uygun NCR bulunamadı.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(ncr => {
+                let sevBadge = 'text-sky-300 bg-sky-950/60 border border-sky-800';
+                if (ncr.severity === 'Kritik') sevBadge = 'text-rose-300 bg-rose-950/80 border border-rose-800 font-bold';
+                if (ncr.severity === 'Majör') sevBadge = 'text-amber-300 bg-amber-950/80 border border-amber-800 font-semibold';
+
+                let statusBadge = 'bg-slate-800 text-slate-300';
+                if (ncr.status.includes('Açık') || ncr.status.includes('Karantina')) statusBadge = 'bg-rose-900/60 text-rose-300 border border-rose-700';
+                if (ncr.status.includes('MRB')) statusBadge = 'bg-amber-900/60 text-amber-300 border border-amber-700';
+                if (ncr.status.includes('DÖF')) statusBadge = 'bg-indigo-900/60 text-indigo-300 border border-indigo-700';
+                if (ncr.status.includes('Kapatıldı')) statusBadge = 'bg-emerald-900/60 text-emerald-300 border border-emerald-700';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-aselsan-hover/40 transition border-b border-aselsan-border/40';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono font-bold text-sky-400">${ncr.id}</td>
+                    <td class="py-3 px-4 text-slate-400">${ncr.date}</td>
+                    <td class="py-3 px-4 font-semibold text-white">${ncr.project}</td>
+                    <td class="py-3 px-4 font-mono text-sky-300">${ncr.partCode} <span class="block text-[10px] text-slate-500 font-mono">${ncr.serialNo}</span></td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-[11px] ${sevBadge}">${ncr.severity}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-200 max-w-sm truncate" title="${ncr.desc}">${ncr.desc}</td>
+                    <td class="py-3 px-4 text-slate-300">${ncr.responsible}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge}">${ncr.status}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="viewNCRDetail('${ncr.id}')" class="p-1.5 rounded-lg bg-sky-600/30 hover:bg-sky-600 text-sky-300 hover:text-white transition" title="5-Neden ve 8D Raporunu İncele">
+                            <i class="fa-solid fa-file-shield"></i> 8D Gör
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function viewNCRDetail(ncrId) {
+            const item = ncrs.find(n => n.id === ncrId);
+            if (!item) return;
+
+            document.getElementById('modal-ncr-title').innerText = `${item.id} - ASELSAN MRB & 8D Raporu`;
+            document.getElementById('modal-project').innerText = item.project;
+            document.getElementById('modal-part').innerText = item.partCode;
+            document.getElementById('modal-serial').innerText = item.serialNo;
+            document.getElementById('modal-severity').innerText = item.severity;
+            document.getElementById('modal-status').innerText = item.status;
+            document.getElementById('modal-dept').innerText = item.responsible;
+            document.getElementById('modal-desc').innerText = item.desc;
+            document.getElementById('modal-root-cause').innerHTML = item.rootCause || 'Kök neden analizi devam ediyor.';
+            document.getElementById('modal-capa-action').innerText = item.capaAction || 'Aksiyon atanmadı.';
+
+            document.getElementById('ncr-detail-modal').classList.remove('hidden');
+        }
+
+        function closeNCRDetailModal() {
+            document.getElementById('ncr-detail-modal').classList.add('hidden');
+        }
+
+        function openNewNCRModal() {
+            document.getElementById('new-ncr-modal').classList.remove('hidden');
+            if (currentUser) {
+                document.getElementById('ncr-new-owner').value = `${currentUser.name} (${currentUser.role})`;
+            }
+        }
+
+        function closeNewNCRModal() {
+            document.getElementById('new-ncr-modal').classList.add('hidden');
+        }
+
+        function handleNewNCRSubmit(e) {
+            e.preventDefault();
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+
+            const newNCR = {
+                id: 'NCR-' + now.getFullYear() + '-' + Math.floor(100 + Math.random() * 900),
+                date: dateStr,
+                project: document.getElementById('ncr-new-project').value,
+                partCode: document.getElementById('ncr-new-part').value.trim(),
+                serialNo: document.getElementById('ncr-new-lot').value.trim(),
+                severity: document.getElementById('ncr-new-severity').value,
+                status: 'Açık (Karantinada)',
+                desc: document.getElementById('ncr-new-desc').value.trim(),
+                rootCause: document.getElementById('ncr-new-root').value.trim() || 'MRB heyeti kök neden analizi devam ediyor.',
+                capaAction: 'İnceleme başlatıldı.',
+                responsible: document.getElementById('ncr-new-owner').value.trim()
+            };
+
+            ncrs.unshift(newNCR);
+            saveData();
+            refreshAllData();
+            closeNewNCRModal();
+            document.getElementById('new-ncr-form').reset();
+            showToast(`Yeni Savunma NCR (${newNCR.id}) açıldı ve karantinaya alındı!`, 'error');
+            switchTab('ncr');
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let passCount = 0;
+
+            checklist.forEach((item, index) => {
+                if (item.passed) passCount++;
+
+                const row = document.createElement('div');
+                row.className = `p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition ${
+                    item.passed ? 'bg-aselsan-navy border-aselsan-border' : 'bg-rose-950/20 border-rose-800/60'
+                }`;
+
+                row.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-aselsan-dark text-sky-400 border border-sky-800">${item.cat}</span>
+                            <h4 class="font-bold text-sm text-white">${item.title}</h4>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-1">${item.desc}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleChecklistItem(${index}, true)" class="px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                            item.passed ? 'bg-emerald-600 text-white shadow' : 'bg-aselsan-dark text-slate-400 hover:bg-slate-800'
+                        }">
+                            <i class="fa-solid fa-check"></i> UYGUN (PASS)
+                        </button>
+                        <button onclick="toggleChecklistItem(${index}, false)" class="px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                            !item.passed ? 'bg-rose-600 text-white shadow' : 'bg-aselsan-dark text-slate-400 hover:bg-slate-800'
+                        }">
+                            <i class="fa-solid fa-xmark"></i> RET (FAIL)
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            const score = checklist.length > 0 ? Math.round((passCount / checklist.length) * 100) : 100;
+            const scoreEl = document.getElementById('checklist-score');
+            if (scoreEl) {
+                scoreEl.innerText = `%${score}`;
+                scoreEl.className = `text-2xl font-extrabold font-tech ${score >= 90 ? 'text-emerald-400' : (score >= 75 ? 'text-amber-400' : 'text-rose-400')}`;
+            }
+        }
+
+        function toggleChecklistItem(index, state) {
+            checklist[index].passed = state;
+            saveData();
+            renderChecklist();
+        }
+
+        function resetChecklist() {
+            checklist.forEach(c => c.passed = true);
+            saveData();
+            renderChecklist();
+            showToast('Askeri denetim matrisi varsayılan duruma sıfırlandı.', 'info');
+        }
+
+        function initCharts() {
+            const ctxDefect = document.getElementById('chart-defect-type');
+            if (ctxDefect) {
+                if (defectChart) defectChart.destroy();
+                defectChart = new Chart(ctxDefect, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Lehim Köprüsü', 'Yetersiz Lehim', 'Tombstone', 'Ters Polarite', 'Krimp Çekme', 'Tork Hatası', 'BGA Void'],
+                        datasets: [{
+                            label: 'Tespit Sayısı',
+                            data: [14, 8, 6, 5, 4, 3, 2],
+                            backgroundColor: '#0072CE',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#113554' },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#94a3b8', font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const ctxProject = document.getElementById('chart-project-distribution');
+            if (ctxProject) {
+                if (projectChart) projectChart.destroy();
+                projectChart = new Chart(ctxProject, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['HİSAR', 'KORKUT', 'SARP UKSS', 'PYOM Denizaltı', 'AVCI'],
+                        datasets: [{
+                            data: [35, 25, 20, 12, 8],
+                            backgroundColor: ['#0072CE', '#10b981', '#f59e0b', '#38BDF8', '#8b5cf6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#cbd5e1', font: { size: 11 }, padding: 12 }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateChartsData() {
+            if (!defectChart || !projectChart) return;
+
+            const defectMap = {};
+            const projectMap = {};
+
+            inspections.forEach(item => {
+                if (item.result !== 'Kabul') {
+                    defectMap[item.defectCode] = (defectMap[item.defectCode] || 0) + 1;
+                }
+                const shortProj = item.project.split(' ')[0];
+                projectMap[shortProj] = (projectMap[shortProj] || 0) + 1;
+            });
+
+            if (Object.keys(defectMap).length > 0) {
+                defectChart.data.labels = Object.keys(defectMap).map(k => k.length > 20 ? k.substring(0, 18) + '...' : k);
+                defectChart.data.datasets[0].data = Object.values(defectMap);
+                defectChart.update();
+            }
+
+            if (Object.keys(projectMap).length > 0) {
+                projectChart.data.labels = Object.keys(projectMap);
+                projectChart.data.datasets[0].data = Object.values(projectMap);
+                projectChart.update();
+            }
+        }
+
+        function exportToCSV() {
+            if (inspections.length === 0) {
+                showToast('Dışa aktarılacak kayıt yok!', 'error');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "Muayene ID,Tarih Saat,Proje,Istasyon,Parca Kodu,Seri No,SAP Is Emri,Standart,Sonuc,Hata Tipi,Hata Detayi,Uzman\n";
+
+            inspections.forEach(row => {
+                const line = [
+                    `"${row.id}"`,
+                    `"${row.timestamp}"`,
+                    `"${row.project}"`,
+                    `"${row.station}"`,
+                    `"${row.partCode}"`,
+                    `"${row.serialNo}"`,
+                    `"${row.workOrder}"`,
+                    `"${row.standard}"`,
+                    `"${row.result}"`,
+                    `"${row.defectCode}"`,
+                    `"${row.defectDetail}"`,
+                    `"${row.inspector}"`
+                ].join(",");
+                csvContent += line + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `ASELSAN_Kalite_Muayene_Raporu_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('ASELSAN Kalite Verileri Excel / CSV olarak indirildi.', 'success');
+        }
+
+        function saveData() {
+            localStorage.setItem('aselsan_inspections', JSON.stringify(inspections));
+            localStorage.setItem('aselsan_ncrs', JSON.stringify(ncrs));
+            localStorage.setItem('aselsan_checklist', JSON.stringify(checklist));
+        }
+    </script>
+</body>
+</html>
